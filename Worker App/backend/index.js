@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -11,7 +13,6 @@ const crypto = require('crypto');
 const Report = require('./models/Report');
 const Booking = require('./models/Booking');
 const Review = require('./models/Review');
-require('dotenv').config();
 
 const app = express();
 app.use(cors());
@@ -29,11 +30,22 @@ app.use('/api/bookings', bodyParser.json());
 app.use('/api/reviews', bodyParser.json());
 // Do NOT use for /profile PUT (file upload)
 
-// MongoDB connection
-const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://manieerr:nCVBWRvTFgEYGeQV@cluster0.8qmqc77.mongodb.net/expoapp?retryWrites=true&w=majority&appName=Cluster0';
-mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+// Connect to MongoDB
+const mongoUri = process.env.MONGODB_URI;
+if (!mongoUri) {
+  console.error('MONGODB_URI environment variable is not set');
+  process.exit(1);
+}
+
+mongoose.connect(mongoUri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('Connected to MongoDB'))
+.catch(err => {
+  console.error('MongoDB connection error:', err);
+  process.exit(1);
+});
 
 // User schema
 const userSchema = new mongoose.Schema({
