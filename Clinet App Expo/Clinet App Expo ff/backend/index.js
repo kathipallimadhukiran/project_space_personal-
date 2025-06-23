@@ -42,12 +42,32 @@ const app = express();
 // Server configuration with environment variables and fallbacks
 const PORT = process.env.PORT || 1000;
 const HOST = '0.0.0.0'; // Listen on all network interfaces
-const LOCAL_IP = '192.168.175.58'; // Local IP for constructing accessible URLs
+const LOCAL_IP = '192.168.125.111'; // Local IP for constructing accessible URLs
 
 // MongoDB connection
 mongoose.connect('mongodb+srv://manieerr:nCVBWRvTFgEYGeQV@cluster0.8qmqc77.mongodb.net/expoapp?retryWrites=true&w=majority&appName=Cluster0', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+}).then(async () => {
+  console.log('MongoDB connected');
+  
+  // Drop the problematic index
+  try {
+    const collections = await mongoose.connection.db.collections();
+    for (let collection of collections) {
+      if (collection.collectionName === 'clinetusers') {
+        await collection.dropIndex('e_1');
+        console.log('Successfully dropped problematic index');
+        break;
+      }
+    }
+  } catch (error) {
+    if (error.code !== 27) { // 27 is the error code for index not found
+      console.error('Error handling index:', error);
+    }
+  }
+}).catch(err => {
+  console.error('MongoDB connection error:', err);
 });
 
 // User Schema

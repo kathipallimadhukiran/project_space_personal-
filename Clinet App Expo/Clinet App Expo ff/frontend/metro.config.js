@@ -14,7 +14,7 @@ config.server = {
   enhanceMiddleware: (middleware) => {
     return (req, res, next) => {
       // Force all URLs to use the local IP and correct port
-      const localIp = '192.168.31.126';
+      const localIp = '192.168.125.111';
       const url = new URL(req.url || '/', `http://${req.headers.host}`);
       url.hostname = localIp;
       url.port = '9000';

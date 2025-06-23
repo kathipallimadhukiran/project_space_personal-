@@ -11,9 +11,13 @@ const crypto = require('crypto');
 const Report = require('./models/Report');
 const Booking = require('./models/Booking');
 const Review = require('./models/Review');
+require('dotenv').config();
 
 const app = express();
 app.use(cors());
+
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Only use bodyParser.json() for routes that expect JSON, not for file uploads
 app.use('/login', bodyParser.json());
@@ -26,7 +30,7 @@ app.use('/api/reviews', bodyParser.json());
 // Do NOT use for /profile PUT (file upload)
 
 // MongoDB connection
-const mongoUri = 'mongodb+srv://manieerr:nCVBWRvTFgEYGeQV@cluster0.8qmqc77.mongodb.net/expoapp?retryWrites=true&w=majority&appName=Cluster0';
+const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://manieerr:nCVBWRvTFgEYGeQV@cluster0.8qmqc77.mongodb.net/expoapp?retryWrites=true&w=majority&appName=Cluster0';
 mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
@@ -78,8 +82,8 @@ const Service = mongoose.model('Service', serviceSchema);
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'manieerr@gmail.com',
-    pass: 'bgol bzto xvib lvio',
+    user: process.env.EMAIL_USER || 'manieerr@gmail.com',
+    pass: process.env.EMAIL_PASS || 'bgol bzto xvib lvio',
   },
 });
 
@@ -99,11 +103,45 @@ if (!fs.existsSync('uploads')) {
   fs.mkdirSync('uploads');
 }
 
-// Load RSA keys
+// Ensure keys directory exists
+const keysDir = path.join(__dirname, 'keys');
+if (!fs.existsSync(keysDir)) {
+  fs.mkdirSync(keysDir);
+}
+
+// Load or generate RSA keys
 const PUBLIC_KEY_PATH = path.join(__dirname, 'keys', 'public.pem');
 const PRIVATE_KEY_PATH = path.join(__dirname, 'keys', 'private.pem');
-const publicKey = fs.readFileSync(PUBLIC_KEY_PATH, 'utf8');
-const privateKey = fs.readFileSync(PRIVATE_KEY_PATH, 'utf8');
+
+let publicKey, privateKey;
+
+try {
+  // Try to read existing keys
+  publicKey = fs.readFileSync(PUBLIC_KEY_PATH, 'utf8');
+  privateKey = fs.readFileSync(PRIVATE_KEY_PATH, 'utf8');
+} catch (error) {
+  // Generate new keys if they don't exist
+  console.log('Generating new RSA keys...');
+  const { publicKey: pubKey, privateKey: privKey } = crypto.generateKeyPairSync('rsa', {
+    modulusLength: 2048,
+    publicKeyEncoding: {
+      type: 'spki',
+      format: 'pem'
+    },
+    privateKeyEncoding: {
+      type: 'pkcs8',
+      format: 'pem'
+    }
+  });
+  
+  // Save the keys
+  fs.writeFileSync(PUBLIC_KEY_PATH, pubKey);
+  fs.writeFileSync(PRIVATE_KEY_PATH, privKey);
+  
+  publicKey = pubKey;
+  privateKey = privKey;
+  console.log('RSA keys generated and saved successfully');
+}
 
 // Endpoint to serve the public key
 app.get('/public-key', (req, res) => {
@@ -621,9 +659,6 @@ app.post('/change-password', bodyParser.json(), async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
-// Serve uploaded files
-app.use('/uploads', express.static('uploads'));
 
 app.post('/report', express.json(), async (req, res) => {
   const { email, type, details, extra } = req.body;

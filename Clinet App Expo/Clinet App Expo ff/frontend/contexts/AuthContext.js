@@ -29,11 +29,20 @@ export const AuthProvider = ({ children }) => {
           if (expiryDate > now) {
             setUser(JSON.parse(storedUser));
           } else {
+            // Session expired
             await AsyncStorage.multiRemove([USER_KEY, TOKEN_EXPIRY_KEY]);
+            setUser(null);
+            // Navigate to login after a short delay to ensure state is updated
+            setTimeout(() => {
+              if (navigationRef.current) {
+                navigationRef.current.navigate('Login');
+              }
+            }, 100);
           }
         }
       } catch (error) {
         console.error('Failed to load user', error);
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -65,15 +74,10 @@ export const AuthProvider = ({ children }) => {
       // Then update the state
       setUser(null);
       
-      // Add a small delay to ensure state updates propagate
+      // Navigate to login after a short delay to ensure state is updated
       setTimeout(() => {
-        // Reset navigation to Login screen using RootNavigation
-        if (resetToLogin) {
-          resetToLogin();
-        } else {
-          console.warn('resetToLogin function is not available');
-          // Fallback to simple navigation if resetToLogin is not available
-          navigationRef.navigate('Auth', { screen: 'Login' });
+        if (navigationRef.current) {
+          navigationRef.current.navigate('Login');
         }
       }, 100);
       

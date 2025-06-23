@@ -227,12 +227,16 @@ function AppContent() {
     return <SplashScreen />;
   }
 
-      // Main app navigation
+  // Main app navigation
   return (
     <NavigationContainer 
       ref={navigationRef}
       onReady={() => {
         console.log('Navigation is ready');
+        // Initialize to the appropriate screen based on auth state
+        if (!user && navigationRef.current) {
+          navigationRef.current.navigate('Login');
+        }
       }}
     >
       {user ? (

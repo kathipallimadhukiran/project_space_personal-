@@ -450,7 +450,7 @@ export default function App() {
                       try {
                         const verifyRes = await api.verifyOtp(email, otp);
                         console.log('OTP verification response:', verifyRes);
-                        if (verifyRes.success) {
+                        if (verifyRes.success || verifyRes.message === 'OTP verified') {
                           // Fetch profile and services after successful login/signup
                           const userProfile = await api.getProfile(email);
                           if (!userProfile || userProfile.message === 'User not found') {
@@ -470,9 +470,6 @@ export default function App() {
                             // Continue even if services fail to load
                           }
                           
-                          // Mark as authenticated
-                          setIsAuthenticated(true);
-                          
                           // Save login info for persistent login
                           await SecureStore.setItemAsync('userLogin', JSON.stringify({ 
                             email, 
@@ -487,9 +484,12 @@ export default function App() {
                             // Continue even if bookings fail to load
                           }
                           
-                          // Ensure navigation happens by setting auth state
+                          // Set authenticated state to navigate to main app
+                          setIsAuthenticated(true);
+                          
+                          // Reset auth state
                           setEmail('');
-                          setOtpContext('login'); // Set to valid OtpContext value
+                          setOtpContext('login');
                           setAuthView('login');
                         } else {
                           setOtpError(verifyRes.message || 'OTP verification failed');

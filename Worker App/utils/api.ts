@@ -1,7 +1,7 @@
 import forge from 'node-forge';
 import { Booking, BookingStatus } from '../types';
 
-export const BASE_URL = 'http://192.168.225.58:5000';
+export const BASE_URL = 'http://192.168.125.111:5000';
 
 export async function signup(name: string, email: string, password: string) {
   // Fetch public key

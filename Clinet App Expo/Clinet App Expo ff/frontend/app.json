@@ -11,7 +11,7 @@
       "host": "0.0.0.0"
     },
     "extra": {
-      "LOCAL_IP": "192.168.31.126",
+      "LOCAL_IP": "192.168.125.111",
       "eas": {
         "projectId": "7a8497b5-784a-4cfe-9d30-bb0e83cb7fbf"
       }
