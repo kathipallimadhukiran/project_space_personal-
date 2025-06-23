@@ -31,7 +31,7 @@ app.use('/api/reviews', bodyParser.json());
 // Do NOT use for /profile PUT (file upload)
 
 // Connect to MongoDB
-const mongoUri = process.env.MONGODB_URI;
+const mongoUri = 'mongodb+srv://manieerr:nCVBWRvTFgEYGeQV@cluster0.8qmqc77.mongodb.net/expoapp?retryWrites=true&w=majority&appName=Cluster0';
 if (!mongoUri) {
   console.error('MONGODB_URI environment variable is not set');
   process.exit(1);
