@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "frontend",
+    "slug": "frontend",
+    "version": "1.0.0",
+    "developmentClient": {
+      "silentLaunch": false
+    },
+    "packagerOpts": {
+      "port": 8081,
+      "host": "0.0.0.0"
+    },
+    "extra": {
+      "LOCAL_IP": "192.168.31.126",
+      "eas": {
+        "projectId": "7a8497b5-784a-4cfe-9d30-bb0e83cb7fbf"
+      }
+    },
+    "orientation": "portrait",
+    "icon": "./assets/logo.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.shankarb22.frontend"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.shankarb22.frontend"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "scheme": "frontend",
+    "plugins": []
+  }
+}
